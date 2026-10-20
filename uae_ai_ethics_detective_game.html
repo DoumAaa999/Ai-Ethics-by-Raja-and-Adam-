@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The UAE AI Ethics Detective</title>
+    <style>
+        /* CSS Reset & Variables */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --bg-color: #0b0d14;
+            --card-bg: rgba(22, 27, 40, 0.85);
+            --border-glow: #00f0ff;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --accent-gold: #ffb703;
+            --accent-neon-green: #39ff14;
+            --accent-alert: #ff0055;
+            --font-mono: 'Courier New', Courier, monospace;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 240, 255, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(255, 0, 85, 0.05) 0%, transparent 20%),
+                linear-gradient(to bottom, #07090e, #0f131d);
+            background-attachment: fixed;
+            overflow-x: hidden;
+        }
+
+        /* Ambient Cyber Grid Overlay */
+        .bg-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-size: 40px 40px;
+            background-image: 
+                linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Container & Glassmorphism Card */
+        .game-container {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 850px;
+            background: var(--card-bg);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 0 30px rgba(0, 240, 255, 0.1), inset 0 0 15px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(12px);
+            transition: all 0.3s ease;
+        }
+
+        /* Headers & Typography */
+        h1, h2, h3 {
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .game-title {
+            font-size: 2.2rem;
+            text-align: center;
+            color: #ffffff;
+            text-shadow: 0 0 10px var(--border-glow), 0 0 20px rgba(0, 240, 255, 0.4);
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--accent-gold);
+            font-size: 0.95rem;
+            margin-bottom: 25px;
+            font-family: var(--font-mono);
+            letter-spacing: 2px;
+        }
+
+        /* Status & Score Bar */
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(10, 14, 23, 0.8);
+            padding: 12px 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 25px;
+        }
+
+        .status-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .status-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-family: var(--font-mono);
+        }
+
+        .status-value {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--border-glow);
+        }
+
+        /* Progress Bar */
+        .progress-wrapper {
+            width: 160px;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+            border: 1px solid rgba(0, 240, 255, 0.3);
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 50%;
+            background: linear-gradient(90deg, var(--border-glow), var(--accent-neon-green));
+            transition: width 0.4s ease, background 0.4s ease;
+        }
+
+        /* Content Sections */
+        .section {
+            display: none;
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Story Box */
+        .story-box {
+            background: rgba(15, 21, 32, 0.9);
+            border-left: 4px solid var(--border-glow);
+            padding: 20px;
+            border-radius: 0 10px 10px 0;
+            margin-bottom: 25px;
+            line-height: 1.6;
+            font-size: 1.05rem;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .location-tag {
+            display: inline-block;
+            background: rgba(0, 240, 255, 0.15);
+            color: var(--border-glow);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-family: var(--font-mono);
+            margin-bottom: 12px;
+            border: 1px solid rgba(0, 240, 255, 0.3);
+        }
+
+        /* Decision Options */
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .option-btn {
+            background: rgba(26, 33, 50, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: var(--text-main);
+            padding: 16px 20px;
+            border-radius: 8px;
+            text-align: left;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .option-btn:hover {
+            border-color: var(--border-glow);
+            background: rgba(35, 46, 70, 0.9);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+            transform: translateX(4px);
+        }
+
+        .option-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .option-prefix {
+            font-family: var(--font-mono);
+            color: var(--accent-gold);
+            font-weight: bold;
+        }
+
+        /* Feedback Box */
+        .feedback-box {
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            display: none;
+            line-height: 1.6;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .feedback-box.correct {
+            display: block;
+            background: rgba(57, 255, 20, 0.1);
+            border: 1px solid var(--accent-neon-green);
+            color: #d1ffd0;
+        }
+
+        .feedback-box.incorrect {
+            display: block;
+            background: rgba(255, 0, 85, 0.1);
+            border: 1px solid var(--accent-alert);
+            color: #ffd0dc;
+        }
+
+        .feedback-header {
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Main Buttons */
+        .primary-btn {
+            background: linear-gradient(135deg, #00f0ff, #0077ff);
+            color: #000;
+            font-weight: bold;
+            padding: 14px 28px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+            transition: all 0.2s ease;
+            display: inline-block;
+        }
+
+        .primary-btn:hover {
+            box-shadow: 0 0 25px rgba(0, 240, 255, 0.7);
+            transform: translateY(-2px);
+        }
+
+        .center-btn-wrapper {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        /* Start & Ending Visual Elements */
+        .intro-card {
+            background: rgba(10, 14, 23, 0.6);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px dashed rgba(0, 240, 255, 0.3);
+            margin-bottom: 25px;
+        }
+
+        .intro-card h3 {
+            color: var(--accent-gold);
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .intro-card ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .intro-card li {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 8px;
+            color: var(--text-muted);
+        }
+
+        .intro-card li::before {
+            content: "►";
+            position: absolute;
+            left: 0;
+            color: var(--border-glow);
+            font-size: 0.8rem;
+        }
+
+        .evaluation-card {
+            background: rgba(15, 21, 32, 0.95);
+            border: 1px solid var(--accent-gold);
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .evaluation-card h3 {
+            color: var(--accent-gold);
+            margin-bottom: 12px;
+            font-size: 1.2rem;
+            border-bottom: 1px solid rgba(255, 183, 3, 0.3);
+            padding-bottom: 8px;
+        }
+
+        .peer-test-box {
+            background: rgba(0, 240, 255, 0.05);
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            font-size: 0.95rem;
+        }
+
+        .peer-test-box h4 {
+            color: var(--border-glow);
+            margin-bottom: 6px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            .game-container {
+                padding: 18px;
+            }
+            .game-title {
+                font-size: 1.6rem;
+            }
+            .status-bar {
+                flex-direction: column;
+                gap: 12px;
+                align-items: flex-start;
+            }
+            .progress-wrapper {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-grid"></div>
+
+    <div class="game-container">
+        <!-- Header -->
+        <h1 class="game-title">The UAE AI Ethics Detective</h1>
+        <p class="subtitle">// SYSTEM STATUS: CYBER-NOIR ETHICS PROTOCOL ACTIVE //</p>
+
+        <!-- Status & Score Bar -->
+        <div class="status-bar" id="statusBar">
+            <div class="status-item">
+                <span class="status-label">Investigator Rank</span>
+                <span class="status-value" id="rankDisplay">Junior Auditor</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Public Trust Index</span>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div class="progress-wrapper">
+                        <div class="progress-fill" id="trustFill"></div>
+                    </div>
+                    <span class="status-value" id="trustScoreText">50%</span>
+                </div>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Case File</span>
+                <span class="status-value" id="caseDisplay">0 / 3</span>
+            </div>
+        </div>
+
+        <!-- SCREEN 0: START / BRIEFING -->
+        <div id="screen-start" class="section active">
+            <div class="story-box">
+                <span class="location-tag">MISSION BRIEFING :: DUBAI & ABU DHABI SMART GRID</span>
+                <p>Welcome, Detective. In a high-tech future where autonomous AI algorithms manage urban tourism, hiring platforms, and digital public media across the UAE, rogue models and biased algorithms threaten civic trust.</p>
+                <br>
+                <p>Your objective: Inspect three critical AI alerts. Investigate the underlying ethical flaws—ranging from AI hallucinations and demographic bias to synthetic media—and restore algorithmic fairness to the nation.</p>
+            </div>
+
+            <div class="intro-card">
+                <h3>Target Dossier & Parameters</h3>
+                <ul>
+                    <li><strong>Target Player:</strong> AI Ethics Auditor / Tech-Policy Specialist</li>
+                    <li><strong>Operational Scope:</strong> Spot hallucinations, correct algorithmic hiring bias, and neutralize deepfakes targeting local communities.</li>
+                    <li><strong>Rule Set:</strong> Choices are evaluated on ethical reasoning and legal transparency. Each choice provides instant learning feedback.</li>
+                </ul>
+            </div>
+
+            <div class="center-btn-wrapper">
+                <button class="primary-btn" onclick="startGame()">Initialize Audit</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 1: DECISION 1 (Hallucination) -->
+        <div id="screen-decision-1" class="section">
+            <div class="story-box">
+                <span class="location-tag">LOCATION: AL FAHIDI HISTORICAL NEIGHBORHOOD, DUBAI</span>
+                <p><strong>ALERT:</strong> An AI-powered Smart Tourism Guide app used by thousands of tourists in Dubai is generating hallucinated historical claims. During a guided audio walk, the AI stated that <em>"The iconic Al Fahidi Fort was constructed in 2010 out of synthetic glass fiber to serve as a shopping mall."</em></p>
+                <br>
+                <p>Tourists are sharing this false claim on social media, misrepresenting UAE cultural heritage. What is your immediate detective protocol?</p>
+            </div>
+
+            <div class="options-grid" id="options-1">
+                <button class="option-btn" onclick="makeChoice(1, 0)">
+                    <span class="option-prefix">[A]</span> Allow the AI to keep running, but add an AI chatbot pop-up guessing if tourists are satisfied with the trivia.
+                </button>
+                <button class="option-btn" onclick="makeChoice(1, 1)">
+                    <span class="option-prefix">[B]</span> Flag the claim as an unverified AI hallucination, temporarily pause the feature, and cross-reference verified records from the Dubai Culture & Heritage Authority.
+                </button>
+                <button class="option-btn" onclick="makeChoice(1, 2)">
+                    <span class="option-prefix">[C]</span> Permanently delete the tour app entirely without auditing the underlying language model dataset.
+                </button>
+            </div>
+
+            <div id="feedback-1" class="feedback-box"></div>
+
+            <div class="center-btn-wrapper" id="next-wrapper-1" style="display: none;">
+                <button class="primary-btn" onclick="goToScreen('screen-decision-2')">Proceed to Case File #2</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 2: DECISION 2 (Bias/Ethics) -->
+        <div id="screen-decision-2" class="section">
+            <div class="story-box">
+                <span class="location-tag">LOCATION: HUB71 TECH ECOSYSTEM, ABU DHABI</span>
+                <p><strong>ALERT:</strong> A prominent tech startup accelerator in Abu Dhabi deployed an automated AI resume screening system to shortlist candidates for software engineering roles. An internal audit reveals that the AI systematically downranks qualified female engineers and candidates who studied at specific regional universities, giving preferential scores only to specific historic demographic templates.</p>
+                <br>
+                <p>How do you rectify this systemic algorithmic bias?</p>
+            </div>
+
+            <div class="options-grid" id="options-2">
+                <button class="option-btn" onclick="makeChoice(2, 0)">
+                    <span class="option-prefix">[A]</span> Ignore the bias since automated screening speeds up the hiring pipeline for recruiters.
+                </button>
+                <button class="option-btn" onclick="makeChoice(2, 1)">
+                    <span class="option-prefix">[B]</span> Identify dataset proxy variables (such as gender markers and university locations), re-weight screening parameters for merit, and mandate human-in-the-loop oversight.
+                </button>
+                <button class="option-btn" onclick="makeChoice(2, 2)">
+                    <span class="option-prefix">[C]</span> Lower the passing score threshold for everyone without modifying the biased weighting logic inside the model.
+                </button>
+            </div>
+
+            <div id="feedback-2" class="feedback-box"></div>
+
+            <div class="center-btn-wrapper" id="next-wrapper-2" style="display: none;">
+                <button class="primary-btn" onclick="goToScreen('screen-decision-3')">Proceed to Case File #3</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 3: DECISION 3 (Deepfake) -->
+        <div id="screen-decision-3" class="section">
+            <div class="story-box">
+                <span class="location-tag">LOCATION: DIGITAL MEDIA AUDIT CENTER, DUBAI SILICON OASIS</span>
+                <p><strong>ALERT:</strong> A hyper-realistic deepfake video of a prominent UAE civic leader is circulating rapidly online. In the synthetic video, the official falsely announces the immediate cancellation of a major national renewable energy transition initiative.</p>
+                <br>
+                <p>Panic is beginning to spread across financial markets and public forums. What action do you take to resolve this synthetic media threat?</p>
+            </div>
+
+            <div class="options-grid" id="options-3">
+                <button class="option-btn" onclick="makeChoice(3, 0)">
+                    <span class="option-prefix">[A]</span> Analyze video frame boundaries, lighting consistency, and audio spectral glitches to confirm synthetic manipulation, then publish an official verified fact-check with cryptographic authenticity tags.
+                </button>
+                <button class="option-btn" onclick="makeChoice(3, 1)">
+                    <span class="option-prefix">[B]</span> Share the video on official channels to ask citizens if they think it looks real or fake before taking action.
+                </button>
+                <button class="option-btn" onclick="makeChoice(3, 2)">
+                    <span class="option-prefix">[C]</span> Create a counter-deepfake video using a synthetic voice to argue back on social media platforms.
+                </button>
+            </div>
+
+            <div id="feedback-3" class="feedback-box"></div>
+
+            <div class="center-btn-wrapper" id="next-wrapper-3" style="display: none;">
+                <button class="primary-btn" onclick="showEnding()">Generate Final Audit Report</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 4: ENDING & EVALUATION -->
+        <div id="screen-ending" class="section">
+            <div class="story-box">
+                <span class="location-tag">AUDIT SUMMARY REPORT :: CYBER ETHICS COMMAND</span>
+                <h2 id="endingTitle" style="color: var(--border-glow); margin-bottom: 10px;">Audit Complete</h2>
+                <p id="endingText">Your performance metrics have been compiled based on ethical rigor, civic impact, and algorithmic governance standards.</p>
+            </div>
+
+            <div class="evaluation-card">
+                <h3>Detective Grade: <span id="finalGrade" style="color: var(--accent-gold);">S-Class</span></h3>
+                <p id="gradeDetails">You demonstrated exceptional mastery of AI ethics, safeguarding both local heritage and algorithmic integrity across the UAE.</p>
+
+                <div class="peer-test-box">
+                    <h4>Fairness Improvement & Peer Testing Framework</h4>
+                    <p><strong>How a peer can test this game's underlying logic:</strong></p>
+                    <p>1. <em>Edge Case Testing:</em> Check if selecting incorrect options systematically degrades the Public Trust Index without locking the game state.</p>
+                    <p>2. <em>Explanatory Verification:</em> Confirm that every wrong choice explains the specific AI failure mode (e.g., hallucination vs proxy bias) rather than relying on arbitrary guessing.</p>
+                </div>
+            </div>
+
+            <div class="center-btn-wrapper">
+                <button class="primary-btn" onclick="restartGame()">Restart Case File Audit</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* Game State Variables */
+        let state = {
+            trustScore: 50,
+            currentCase: 0,
+            decisions: [null, null, null]
+        };
+
+        /* Explanatory Data for Decisions */
+        const decisionData = {
+            1: {
+                correctIndex: 1,
+                explanations: [
+                    {
+                        type: 'incorrect',
+                        title: '❌ FAILED: Passive Monitoring',
+                        text: 'Reasoning Deficit: Allowing hallucinated cultural details to remain active causes public misinformation. AI models require grounding against verified ground-truth repositories (like Dubai Culture official databases).'
+                    },
+                    {
+                        type: 'correct',
+                        title: '✓ OPTIMAL: Grounded Verification',
+                        text: 'Ethical Principle: Large Language Models can generate confident false claims (hallucinations). Isolating the unverified claim and grounding facts against official historical archives preserves cultural heritage and public trust.'
+                    },
+                    {
+                        type: 'incorrect',
+                        title: '❌ OVERACTION: Scorched Earth Policy',
+                        text: 'Reasoning Deficit: Shutting down the entire system without dataset inspection fails to diagnose the root hallucination source or improve the underlying AI model.'
+                    }
+                ]
+            },
+            2: {
+                correctIndex: 1,
+                explanations: [
+                    {
+                        type: 'incorrect',
+                        title: '❌ FAILED: Negligent Oversight',
+                        text: 'Reasoning Deficit: Prioritizing system speed over algorithmic fairness codifies historical societal discrimination into automated decisions, violating ethical hiring frameworks.'
+                    },
+                    {
+                        type: 'correct',
+                        title: '✓ OPTIMAL: Algorithmic Remediation',
+                        text: 'Ethical Principle: AI screeners often inherit demographic bias from historical training data. Removing hidden proxy variables and implementing human-in-the-loop oversight restores equal opportunity.'
+                    },
+                    {
+                        type: 'incorrect',
+                        title: '❌ FAILED: Surface Adjustment',
+                        text: 'Reasoning Deficit: Lowering score thresholds leaves biased underlying weights intact, perpetuating unequal distribution for candidates.'
+                    }
+                ]
+            },
+            3: {
+                correctIndex: 0,
+                explanations: [
+                    {
+                        type: 'correct',
+                        title: '✓ OPTIMAL: Forensic Verification',
+                        text: 'Ethical Principle: Deepfakes threaten civic stability. Combining media forensic analysis (artifact detection) with cryptographic authenticity tags provides clear, authoritative truth to the public.'
+                    },
+                    {
+                        type: 'incorrect',
+                        title: '❌ FAILED: Crowdsourced Speculation',
+                        text: 'Reasoning Deficit: Asking the public to vote on unverified media increases confusion, viral spread, and panic before forensic facts are established.'
+                    },
+                    {
+                        type: 'incorrect',
+                        title: '❌ FAILED: Disinformation Escalation',
+                        text: 'Reasoning Deficit: Responding to synthetic media with counter-deepfakes pollutes the public information ecosystem and erodes institutional authority.'
+                    }
+                ]
+            }
+        };
+
+        /* Navigation Functions */
+        function goToScreen(screenId) {
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(sec => sec.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function updateUI() {
+            // Ensure trust bounds
+            state.trustScore = Math.max(0, Math.min(100, state.trustScore));
+            
+            // Progress Bar & Score
+            const fill = document.getElementById('trustFill');
+            const scoreText = document.getElementById('trustScoreText');
+            fill.style.width = state.trustScore + '%';
+            scoreText.textContent = state.trustScore + '%';
+
+            // Dynamic Trust Bar Colors
+            if (state.trustScore >= 70) {
+                fill.style.background = 'linear-gradient(90deg, #00f0ff, #39ff14)';
+            } else if (state.trustScore >= 40) {
+                fill.style.background = 'linear-gradient(90deg, #ffb703, #00f0ff)';
+            } else {
+                fill.style.background = 'linear-gradient(90deg, #ff0055, #ffb703)';
+            }
+
+            // Rank Title
+            const rankDisplay = document.getElementById('rankDisplay');
+            if (state.trustScore >= 80) rankDisplay.textContent = 'Chief AI Strategist';
+            else if (state.trustScore >= 50) rankDisplay.textContent = 'Ethics Detective';
+            else rankDisplay.textContent = 'Junior Auditor';
+
+            // Case Display
+            document.getElementById('caseDisplay').textContent = `${state.currentCase} / 3`;
+        }
+
+        function startGame() {
+            state.trustScore = 50;
+            state.currentCase = 1;
+            state.decisions = [null, null, null];
+            updateUI();
+            goToScreen('screen-decision-1');
+        }
+
+        /* Decision Evaluation */
+        function makeChoice(decisionNum, optionIndex) {
+            const data = decisionData[decisionNum];
+            const isCorrect = (optionIndex === data.correctIndex);
+            
+            // Store state
+            state.decisions[decisionNum - 1] = isCorrect;
+
+            // Score calculation
+            if (isCorrect) {
+                state.trustScore += 20;
+            } else {
+                state.trustScore -= 15;
+            }
+
+            updateUI();
+
+            // Disable options after selection
+            const container = document.getElementById(`options-${decisionNum}`);
+            const buttons = container.querySelectorAll('.option-btn');
+            buttons.forEach(btn => btn.disabled = true);
+
+            // Highlight chosen button
+            buttons[optionIndex].style.borderColor = isCorrect ? 'var(--accent-neon-green)' : 'var(--accent-alert)';
+
+            // Render explanatory feedback
+            const exp = data.explanations[optionIndex];
+            const feedbackBox = document.getElementById(`feedback-${decisionNum}`);
+            feedbackBox.className = `feedback-box ${exp.type}`;
+            feedbackBox.innerHTML = `
+                <div class="feedback-header">${exp.title}</div>
+                <div>${exp.text}</div>
+            `;
+
+            // Reveal proceed button
+            document.getElementById(`next-wrapper-${decisionNum}`).style.display = 'block';
+        }
+
+        /* Ending Calculation */
+        function showEnding() {
+            state.currentCase = 3;
+            updateUI();
+            goToScreen('screen-ending');
+
+            const gradeElem = document.getElementById('finalGrade');
+            const detailsElem = document.getElementById('gradeDetails');
+            const titleElem = document.getElementById('endingTitle');
+
+            if (state.trustScore >= 85) {
+                titleElem.textContent = "AI System Integrity Restored";
+                gradeElem.textContent = "S-Class Senior Auditor";
+                gradeElem.style.color = "var(--accent-neon-green)";
+                detailsElem.textContent = "Outstanding performance. You identified hallucinated tourism claims, eliminated biased recruitment proxy variables in Abu Dhabi tech setups, and neutralized synthetic media threats with forensic rigor.";
+            } else if (state.trustScore >= 50) {
+                titleElem.textContent = "Partial System Recovery";
+                gradeElem.textContent = "B-Grade Ethics Officer";
+                gradeElem.style.color = "var(--accent-gold)";
+                detailsElem.textContent = "Satisfactory audit. You addressed major threats, but some unchecked AI decisions created lingering public uncertainty. Review feedback parameters to strengthen future audits.";
+            } else {
+                titleElem.textContent = "Critical System Compromise";
+                gradeElem.textContent = "C-Grade Suspended Inspector";
+                gradeElem.style.color = "var(--accent-alert)";
+                detailsElem.textContent = "Audit failed. Systemic bias, unchecked hallucinations, and unchecked deepfakes disrupted public trust across smart city initiatives. Re-read the ethics framework and attempt the audit again.";
+            }
+        }
+
+        function restartGame() {
+            // Reset decision screens
+            for (let i = 1; i <= 3; i++) {
+                const container = document.getElementById(`options-${i}`);
+                const buttons = container.querySelectorAll('.option-btn');
+                buttons.forEach(btn => {
+                    btn.disabled = false;
+                    btn.style.borderColor = 'rgba(255, 255, 255, 0.15)';
+                });
+                document.getElementById(`feedback-${i}`).style.display = 'none';
+                document.getElementById(`next-wrapper-${i}`).style.display = 'none';
+            }
+
+            // Back to main screen
+            state.trustScore = 50;
+            state.currentCase = 0;
+            updateUI();
+            goToScreen('screen-start');
+        }
+
+        // Initial setup
+        window.onload = function() {
+            updateUI();
+        };
+    </script>
+</body>
+</html>
